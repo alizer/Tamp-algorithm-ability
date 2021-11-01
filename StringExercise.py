@@ -169,6 +169,8 @@ class lcp(object):
         return ''.join(lcp)
 
 
+
+
 if __name__ == '__main__':
     obj = lcp()
     res = obj.longestCommonPrefix_5(['abc', 'af', 'adsf', 'asdfdf'])
