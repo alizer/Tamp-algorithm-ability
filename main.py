@@ -4,7 +4,7 @@
 # Name:         tamp-fundation-algorithm
 # Author:       wendi
 # Date:         2021/10/19
-from Tree import TrieTree
+from TreeExercise import TrieTree
 
 if __name__ == '__main__':
     trie = TrieTree()
