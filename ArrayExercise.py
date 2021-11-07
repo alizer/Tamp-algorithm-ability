@@ -220,12 +220,6 @@ class FourSum(object):
                 continue
         return res
 
-# class RemoveNthFromEnd(object):
-#     """
-#     https://leetcode-cn.com/problems/remove-nth-node-from-end-of-list/solution/hua-jie-suan-fa-19-shan-chu-lian-biao-de-dao-shu-d/
-#     """
-#     def solution(self, head: ):
-
 
 if __name__ == '__main__':
     obj = FourSum()
