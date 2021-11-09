@@ -68,7 +68,75 @@ class GenerateParenthesis(object):
         return res
 
 
+class LetterCombinations(object):
+    def solution(self, digits: str) -> List[str]:
+        if not digits: return []
+        phone = ['abc','def','ghi','jkl','mno','pqrs','tuv','wxyz']
+        queue = ['']  # 初始化队列
+        for digit in digits:
+            for _ in range(len(queue)):
+                tmp = queue.pop(0)
+                for letter in phone[ord(digit)-50]:# 这里我们不使用 int() 转换字符串，使用ASCII码
+                    queue.append(tmp + letter)
+        return queue
+
+
+class CombinationSum(object):
+    def solution(self, candidates: List[int], target: int) -> List[List[int]]:
+
+        def backtrack(candidates, begin, size, path, res, target):
+
+            if 0 == target:
+                res.append(path)
+                return
+
+            for index in range(begin, size):
+                residue = target - candidates[index]
+                if residue < 0:
+                    break
+
+                backtrack(candidates, index, size, path + [candidates[index]], res, residue)
+
+        size = len(candidates)
+        if size == 0:
+            return []
+
+        candidates.sort()
+        path = []
+        res = []
+        backtrack(candidates, 0, size, path, res, target)
+        return res
+
+
+class CombinationSum2:
+    def solution(self, candidates: List[int], target: int) -> List[List[int]]:
+
+        def dfs(begin, path, residue):
+            if residue == 0:
+                res.append(path[:])
+                return
+
+            for index in range(begin, cnt):
+                if residue < candidates[index]:
+                    break
+
+                if index > begin and candidates[index - 1] == candidates[index]:
+                    continue
+                path.append(candidates[index])
+                dfs(index + 1, path, residue - candidates[index])
+                path.pop()
+
+        cnt = len(candidates)
+        if cnt == 0:
+            return []
+        candidates.sort()
+        res = []
+
+        dfs(0, [], target)
+        return res
+
+
 if __name__ == '__main__':
-    obj = GenerateParenthesis()
-    res = obj.solution2(3)
+    obj = CombinationSum2()
+    res = obj.solution([2,1,2,2,5], 5)
     print(res)
