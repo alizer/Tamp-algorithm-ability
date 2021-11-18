@@ -136,7 +136,74 @@ class CombinationSum2:
         return res
 
 
+class Permute(object):
+    def solution(self, nums: List[int]) -> List[List[int]]:
+        res = []
+        def backtrack(nums, tmp):
+            if not nums:
+                res.append(tmp)
+                return
+            for i in range(len(nums)):
+                backtrack(nums[:i] + nums[i+1:], tmp + [nums[i]])
+        backtrack(nums, [])
+        return res
+
+    def solution2(self, nums: List[int]) -> List[List[int]]:
+        def dfs(nums, size, depth, path, used, res):
+            if depth == size:
+                res.append(path[:])
+                return
+
+            for i in range(size):
+                if not used[i]:
+                    used[i] = True
+                    path.append(nums[i])
+
+                    dfs(nums, size, depth + 1, path, used, res)
+
+                    used[i] = False
+                    path.pop()
+
+        size = len(nums)
+        if len(nums) == 0:
+            return []
+
+        used = [False for _ in range(size)]
+        res = []
+        dfs(nums, size, 0, [], used, res)
+        return res
+
+
+class Permute2(object):
+    def solution(self, nums: List[int]) -> List[List[int]]:
+        def dfs(nums, size, depth, path, used, res):
+            if depth == size:
+                res.append(path[:])
+                return
+
+            for i in range(size):
+                if used[i] or (i > 0 and nums[i] == nums[i-1] and used[i-1]):
+                    continue
+
+                used[i] = True
+                path.append(nums[i])
+
+                dfs(nums, size, depth + 1, path, used, res)
+
+                used[i] = False
+                path.pop()
+
+        size = len(nums)
+        if len(nums) == 0:
+            return []
+        nums.sort()
+        used = [False for _ in range(size)]
+        res = []
+        dfs(nums, size, 0, [], used, res)
+        return res
+
+
 if __name__ == '__main__':
-    obj = CombinationSum2()
-    res = obj.solution([2,1,2,2,5], 5)
+    obj = Permute2()
+    res = obj.solution([1,2,1])
     print(res)
