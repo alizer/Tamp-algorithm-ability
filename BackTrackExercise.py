@@ -203,7 +203,47 @@ class Permute2(object):
         return res
 
 
+class Combination:
+    def solution(self, n: int, k: int) -> List[List[int]]:
+        def backtrack(start, n, k):
+            if len(path) == k:
+                res.append(path[:])
+                return
+
+            for i in range(start, n+1):
+                if i <= n - k + len(path) + 1:
+                    path.append(i)
+                    backtrack(i + 1, n, k)
+                    path.pop()
+
+        res = []
+        path = []
+        backtrack(1, n, k)
+        return res
+
+
+class Subsets:
+    def solution(self, nums: List[int]) -> List[List[int]]:
+        size = len(nums)
+        if size == 0:
+            return []
+
+        def dfs(nums, start, path):
+            res.append(path[:])
+
+            for i in range(start, len(nums)):
+                path.append(nums[i])
+                # 因为 nums 不包含重复元素，并且每一个元素只能使用一次
+                # 所以下一次搜索从 i + 1 开始
+                dfs(nums, i + 1, path)
+                path.pop()
+
+        res = []
+        dfs(nums, 0, [])
+        return res
+
+
 if __name__ == '__main__':
-    obj = Permute2()
-    res = obj.solution([1,2,1])
+    obj = Subsets()
+    res = obj.solution([1,2,3])
     print(res)
