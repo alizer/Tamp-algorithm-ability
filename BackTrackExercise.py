@@ -319,7 +319,35 @@ class Exist(object):
         return False
 
 
+class StringCombination(object):
+    def solution(self, s: str) -> List[str]:
+
+        def backtrack(s, tmp):
+            if tmp:
+                res.append(tmp)
+            for i in range(len(s)):
+                print(i)
+                new_s = s[i+1:]
+                backtrack(new_s, tmp+s[i])
+        res = []
+
+        backtrack(s, '')
+
+        return res
+
+
+def get_all_substrings(string):
+    length = len(string)
+    alist = []
+    for i in range(length):
+        for j in range(i, length):
+            alist.append(string[i:j+1])
+    return alist
+
+
 if __name__ == '__main__':
-    obj = Exist()
-    res = obj.solution(board=[["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word="ABCC")
+    obj = StringCombination()
+    res = obj.solution(s='abc')
     print(res)
+
+    print(get_all_substrings('abc'))

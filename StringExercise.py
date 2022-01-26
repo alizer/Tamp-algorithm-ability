@@ -169,9 +169,145 @@ class lcp(object):
         return ''.join(lcp)
 
 
+class GetMaxRepeatSubLen(object):
+    """
+        求一个字符串中连续出现最多的子串次数
+        https://blog.csdn.net/u012333003/article/details/39230493
+    """
+    def solution(self, input: str):
+        """
+        时间复杂度：O(n^3)，n 为字符串长度
+        空间复杂度：O(1)
+        :param input: abcbcbcabc
+        :return: 连续出现次数最多的子串是bc，出现次数为3。
+        """
+
+        max_cnt = 1
+        input_len = len(input)
+        for i in range(input_len):
+            for j in range(i+1, input_len//2):
+                sub_str = input[i:j]
+                offset = j - i
+                if sub_str == input[j:j+offset]:
+                    count = 2
+                    for k in range(j+offset, input_len, offset):
+                        if sub_str == input[k:k+offset]:
+                            count += 1
+                        else:
+                            break
+                        if count > max_cnt:
+                            max_cnt = count
+
+        return max_cnt
+
+class MinWindow(object):
+    """
+    剑指 Offer II 017. 含有所有字符的最短字符串
+    https://leetcode-cn.com/problems/M1oyTv/
+    """
+    def solution(self, s: str, t: str) -> str:
+        import collections
+        dc_s = collections.defaultdict(int)
+        dc_t = collections.defaultdict(int)
+        for c in t:
+            dc_t[c] += 1
+
+        lp = 0
+        valid_cnt = 0
+        ans = ""
+        for rp in range(len(s)):
+            dc_s[s[rp]] += 1
+            if dc_s[s[rp]] <= dc_t[s[rp]]:
+                valid_cnt += 1
+
+            while lp < rp and dc_s[s[lp]] > dc_t[s[lp]]:
+                dc_s[s[lp]] -= 1
+                lp += 1
+
+            if valid_cnt == len(t):
+                if not ans or rp-lp+1 < len(ans):
+                    ans = s[lp:rp+1]
+        return ans
+
+
+class LongestPalindrome(object):
+    """
+    5. 最长回文子串
+    https://leetcode-cn.com/problems/longest-palindromic-substring/
+    """
+    def solution(self, s: str) -> str:
+        """
+        时间复杂度：O(n^2)，两层循环
+        空间复杂度：O(1)
+        :param s:
+        :return:
+        """
+        start, end = 0, 0
+        for i in range(len(s)):
+            left1, right1 = self.expandAroundCenter(s, i, i)
+            left2, right2 = self.expandAroundCenter(s, i, i+1)
+
+            if right1 - left1 > end - start:
+                start, end = left1, right1
+            if right2 - left2 > end - start:
+                start, end = left2, right2
+        return s[start:end+1]
+
+    def expandAroundCenter(self, s, left, right):
+        while left >= 0 and right < len(s) and s[left] == s[right]:
+            left -= 1
+            right += 1
+        return left+1, right-1
+
+    def solution2(self, s):
+        """
+        马拉车算法
+        Manacher‘s Algorithm
+        :param s:
+        :return:
+        """
+        t = self.preProcess(s)
+        print(t)
+        n = len(t)
+        p = [0]*n
+        C, R = 0, 0
+        for i in range(1, n-1):
+            i_mirror = 2 * C - i
+            print(f'C, R: {C}, {R}')
+            if R > i:
+                p[i] = min(R-i, p[i_mirror])
+            else:
+                p[i] = 0
+
+            while t[i+1+p[i]] == t[i-1-p[i]]:
+                p[i] += 1
+
+            if i + p[i] > R:
+                C = i
+                R = i + p[i]
+
+        max_len = 0
+        center_idx = 0
+        for i in range(1, n-1):
+            if p[i] > max_len:
+                max_len = p[i]
+                center_idx = i
+        start = (center_idx - max_len) // 2
+
+        return s[start:start+max_len]
+
+    def preProcess(self, s):
+        if not s:
+            return "^$"
+        ret = "^"
+        for c in s:
+            ret += "#" + c
+        ret += "#$"
+
+        return ret
 
 
 if __name__ == '__main__':
-    obj = lcp()
-    res = obj.longestCommonPrefix_5(['abc', 'af', 'adsf', 'asdfdf'])
+    obj = LongestPalindrome()
+    res = obj.solution2('saabsadfcbcbac')
     print(res)
