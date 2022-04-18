@@ -346,8 +346,8 @@ def get_all_substrings(string):
 
 
 if __name__ == '__main__':
-    obj = StringCombination()
-    res = obj.solution(s='abc')
+    obj = GenerateParenthesis()
+    res = obj.solution2(n=3)
     print(res)
 
-    print(get_all_substrings('abc'))
+    # print(get_all_substrings('abc'))

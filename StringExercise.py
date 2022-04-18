@@ -307,7 +307,70 @@ class LongestPalindrome(object):
         return ret
 
 
+class PrintMatrix:
+    """
+    顺时针打印数组
+    """
+    def solution(self, matrix):
+        rows = len(matrix)
+        cols = len(matrix[0])
+        result = []
+        if rows == 0 and cols == 0:
+            return result
+        left, right, top, bottom = 0, cols-1, 0, rows-1
+        while left <= right and top <= bottom:
+            # from left to right
+            for i in range(left, right+1):
+                result.append(matrix[top][i])
+            # from top to bottom
+            for i in range(top+1, bottom+1):
+                result.append(matrix[i][right])
+            # from right to left
+            if top != bottom:
+                for i in range(left, right)[::-1]:
+                    result.append(matrix[bottom][i])
+            # from bottom to top
+            if left != right:
+                for i in range(top+1, bottom)[::-1]:
+                    result.append(matrix[i][left])
+            left += 1
+            right += 1
+            bottom += 1
+            top += 1
+
+        return result
+
+    def solution2(self, matrix):
+        """
+        魔方
+        首先取走矩阵的第一行，然后逆时针翻转矩阵，把最后一列翻转到第一行。
+        接着继续取走第一行，然后再继续翻转矩阵，一直到取走所有元素，就是按顺时针打印出来的。
+        :param matrix:
+        :return:
+        """
+
+        # 该函数像魔方一样翻转矩阵，每次都把要打印的一列翻转到第一行
+        def turnMagic(matrix):
+            rows = len(matrix)
+            cols = len(matrix[0])
+            arr = []
+            for i in range(cols-1, -1, -1):
+                tmp = []
+                for j in range(rows):
+                    tmp.append(matrix[j][i])
+                arr.append(tmp)
+            return arr
+
+        res = []
+        while matrix:
+            res += matrix.pop(0)
+            if not matrix:
+                break
+            matrix = turnMagic(matrix)
+        return res
+
+
 if __name__ == '__main__':
-    obj = LongestPalindrome()
-    res = obj.solution2('saabsadfcbcbac')
+    obj = PrintMatrix()
+    res = obj.solution2([[1,2,3],[5,6,7,],[9,10,11]])
     print(res)

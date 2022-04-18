@@ -469,8 +469,91 @@ class LengthOfLongestSubstring(object):
         return max_len
 
 
+class MajorityElement(object):
+    """
+    169. 多数元素
+    https://leetcode-cn.com/problems/majority-element/
+    """
+    def solution(self, arr: List[int]):
+        """
+        摩尔投票法
+        时间复杂度：O(n)
+        空间复杂度：O(1)
+        :param arr:
+        :return:
+        """
+        cand = None
+        count = 0
+        for item in arr:
+            if count == 0:
+                cand = item
+                count += 1
+                continue
+            if cand == item:
+                count += 1
+            else:
+                count -= 1
+        return cand
+
+
+class MajorityElement2(object):
+    """
+    229. 求众数 II
+    https://leetcode-cn.com/problems/majority-element-ii/
+    """
+    def solution(self, arr: List[int]):
+        """
+        时间复杂度：O(n)
+        空间复杂度：O(1)
+        :param arr:
+        :return:
+        """
+        cand1 = None
+        cand2 = None
+        count1 = 0
+        count2 = 0
+        res = []
+
+        for item in arr:
+            print(cand1, cand2)
+            if cand1 == item:
+                count1 += 1
+                continue
+            if cand2 == item:
+                count2 += 1
+                continue
+
+            if count1 == 0:
+                cand1 = item
+                count1 += 1
+                continue
+
+            if count2 == 0:
+                cand2 = item
+                count2 += 1
+                continue
+
+            count1 -= 1
+            count2 -= 1
+
+        count1, count2 = 0, 0
+        for item in arr:
+            if cand1 == item:
+                count1 += 1
+            elif cand2 == item:
+                count2 += 1
+
+        if count1 > len(arr) / 3:
+            res.append(cand1)
+
+        if count2 > len(arr) / 3:
+            res.append(cand2)
+
+        return res
+
+
 if __name__ == '__main__':
-    obj = NumMatrix(matrix=[[3,0,1,4,2],[5,6,3,2,1],[1,2,0,1,5],[4,1,0,1,7],[1,0,3,0,5]])
-    print(obj.arr)
-    res = obj.sumRegion(2, 1, 4, 3)
+    obj = MajorityElement2()
+    # print(obj.arr)
+    res = obj.solution([2, 3, 2, 4, 2, 0, 3, 1])
     print(res)

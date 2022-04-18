@@ -4,6 +4,7 @@
 # Name:         StackExercise
 # Author:       wendi
 # Date:         2021/11/4
+from typing import List
 
 
 class ParenthesesValid(object):
@@ -82,17 +83,185 @@ class MinStack2(object):
         return self.min_value
 
 
+class AsteroidCollision:
+    def solution(self, asteroids):
+        s, p = [], 0
+        while p < len(asteroids):
+            if not s or s[-1] < 0 or asteroids[p] > 0:
+                s.append(asteroids[p])
+            elif s[-1] <= -asteroids[p]:
+                if s.pop() < -asteroids[p]:
+                    continue
+            p += 1
+        return s
+
+
+class DailyTemperatures:
+    def solution(self, temperatures: List[int]):
+        n = len(temperatures)
+        if n == 1:
+            return [0]
+        res = [0] * n
+        stack = []
+        for i in range(n):
+            if not stack or temperatures[stack[-1]] >= temperatures[i]:
+                stack.append(i)
+            elif stack and temperatures[stack[-1]] < temperatures[i]:
+                while stack and temperatures[stack[-1]] < temperatures[i]:
+                    idx = stack[-1]
+                    res[idx] = i - stack.pop()
+                stack.append(i)
+        return res
+
+
+class Solution:
+    def inorderTraversal(self, root):
+        """
+        :type root: TreeNode
+        :rtype: List[int]
+        """
+        if not root:
+            return []
+        return self.inorderTraversal(root.left) + [root.val] + self.inorderTraversal(root.right)
+
+
+class InorderTraversal:
+    """
+    二叉树
+    中序遍历
+    """
+    def solution(self, root):
+        """
+        循环实现
+        :param root:
+        :return:
+        """
+        stack = []
+        res = []
+        curr = root
+
+        while stack or curr:
+            if curr:
+                stack.append(curr)
+                curr = curr.left
+            else:
+                curr = stack.pop()
+                res.append(curr.val)
+                curr = curr.right
+
+    def solution2(self, root):
+        """
+        递归实现
+        :param root:
+        :return:
+        """
+        if not root:
+            return []
+
+        return self.solution2(root.left) + [root.val] + self.solution2(root.right)
+
+
+class LargestRectangleArea:
+    """
+    剑指 Offer II 039. 直方图最大矩形面积
+    https://leetcode-cn.com/problems/0ynMMM/
+    """
+    def solution(self, heights: List[int]) -> int:
+        """
+        单调栈【栈中元素 单调递增】
+        :param heights:
+        :return:
+        """
+        stack = [-1]
+        max_area = 0
+        for i in range(len(heights)):
+            while stack[-1] != -1 and heights[stack[-1]] >= heights[i]:
+                height = heights[stack[-1]]
+                stack.pop()
+                width = i - stack[-1] - 1
+                max_area = max(max_area, height * width)
+            stack.append(i)
+
+        while stack[-1] != -1:
+            height = heights[stack[-1]]
+            stack.pop()
+            width = len(heights) - stack[-1] - 1
+            max_area = max(max_area, height * width)
+        return max_area
+
+
+class MaximalRectangle:
+    """
+    剑指 Offer II 040. 矩阵中最大的矩形
+    https://leetcode-cn.com/problems/PLYXKQ/
+    """
+    def solution(self, matrix: List[str]):
+        """
+        单调栈，上一题的应用
+        :param matrix:
+        :return:
+        """
+
+        def largestRectangleArea(heights: List[int]) -> int:
+            """
+            单调栈【栈中元素 单调递增】
+            :param heights:
+            :return:
+            """
+            stack = [-1]
+            max_area = 0
+            for i in range(len(heights)):
+                while stack[-1] != -1 and heights[stack[-1]] >= heights[i]:
+                    height = heights[stack[-1]]
+                    stack.pop()
+                    width = i - stack[-1] - 1
+                    max_area = max(max_area, height * width)
+                stack.append(i)
+
+            while stack[-1] != -1:
+                height = heights[stack[-1]]
+                stack.pop()
+                width = len(heights) - stack[-1] - 1
+                max_area = max(max_area, height * width)
+            return max_area
+
+        if len(matrix) == 0:
+            return 0
+        max_area = 0
+        heights = [0 for _ in range(len(matrix[0]))]
+        for i in range(len(matrix)):
+            for j in range(len(matrix[0])):
+                if matrix[i][j] == '0':
+                    heights[j] = 0
+                else:
+                    heights[j] += 1
+            max_area = max(max_area, largestRectangleArea(heights))
+        return max_area
+
+
+
+
+
+
+
+
+
+
 if __name__ == '__main__':
-    stack = MinStack2()
-    stack.push(-2)
-    stack.push(0)
-    stack.push(-3)
-    stack.push(5)
-    stack.push(-4)
-    print('最小元素：', stack.getMin())
-    stack.pop()
-    stack.pop()
-    stack.pop()
-    print('最小元素：', stack.getMin())
+    # stack = MinStack2()
+    # stack.push(-2)
+    # stack.push(0)
+    # stack.push(-3)
+    # stack.push(5)
+    # stack.push(-4)
+    # print('最小元素：', stack.getMin())
+    # stack.pop()
+    # stack.pop()
+    # stack.pop()
+    # print('最小元素：', stack.getMin())
     # print(stack.minStack)
+
+    obj = DailyTemperatures()
+    res = obj.solution(temperatures = [73,74,75,71,69,72,76,73])
+    print(res)
 
