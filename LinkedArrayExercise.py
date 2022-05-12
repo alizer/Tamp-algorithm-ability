@@ -11,9 +11,19 @@ from typing import List, Optional
 
 
 class ListNode:
-    def __init__(self, val=0, next=None):
+    """
+    单向链表
+    """
+    def __init__(self, val=0, next= None):
         self.val = val
         self.next = next
+
+class DoubleListNode:
+    """双向链表"""
+    def __init__(self, val=0, next=None, last=None):
+        self.next = next
+        self.last = last
+        self.val = val
 
 
 class MergeTwoLinkedArray(object):
@@ -272,4 +282,651 @@ class ReorderList:
 
             l2.next = l1
             l2 = l2_tmp
+
+
+class ReverseDoubleListNode:
+    def solution(self, head: DoubleListNode) -> DoubleListNode:
+        pre, next = None, None
+        while head:
+            next = head.next
+            head.next = pre
+            head.last = next
+            pre = head
+            head = next
+
+        return pre
+
+
+class LinkedList2QueueAndStack:
+    class myQueue:
+        """
+        用单链表实现队列
+        """
+        def __init__(self, head: ListNode, tail: ListNode, size: int):
+            self.head = head
+            self.tail = tail
+            self.size = 0
+
+        def isEmpty(self):
+            return self.size == 0
+
+        def offer(self, value: int):
+            """往队列中插入值"""
+            # 生成新节点
+            cur = ListNode(val=value)
+            if not self.tail:  # 说明此时队列为空，将头和尾指针分别指向新节点
+                self.head = cur
+                self.tail = cur
+            else:
+                self.tail.next = cur
+                self.tail = cur
+
+            self.size += 1
+
+        def poll(self):
+            """
+            出列，即将头节点从队列中移出
+            :return:
+            """
+            res = None
+            if self.head:
+                res = self.head.val
+                self.head = self.head.next
+                self.size -= 1
+
+            # 如果此时头节点为空了，那将尾结点也置为空
+            if not self.head:
+                self.tail = None
+
+            return res
+
+    class myStack:
+        """
+        用单链表实现栈
+        """
+        def __init__(self, head: ListNode, size: int):
+            self.head = head
+            self.size = size
+
+        def isEmpty(self):
+            return self.size == 0
+
+        def push(self, value: int):
+            """
+            压栈
+            :param value:
+            :return:
+            """
+            # 生成新节点
+            cur = ListNode(val=value)
+            if not self.head:
+                self.head = cur
+            else:
+                cur.next = self.head
+                self.head = cur
+            self.size += 1
+
+        def pop(self):
+            """
+            出栈
+            :return:
+            """
+            res = None
+            if self.head:
+                res = self.head.val
+                self.head = self.head.next
+                self.size -= 1
+
+            return res
+
+
+class DoubleLinkedList2Deque:
+    """
+    双向链表实现双向队列
+    """
+    class myDeque:
+        def __init__(self, head: DoubleListNode, tail: DoubleListNode, size: int):
+            self.head = head
+            self.tail = tail
+            self.size = size
+
+        def isEmpty(self):
+            return self.size == 0
+
+        def pushHead(self, value: int):
+            """
+            从队列头插入数据
+            :param value:
+            :return:
+            """
+            cur = DoubleListNode(value)
+
+            if not self.head:  # 说明此时双向队列为空，将头和尾指针分别指向新节点
+                self.head = cur
+                self.tail = cur
+            else:
+                cur.next = self.head
+                self.head.last = cur
+                self.head = cur
+            self.size += 1
+
+        def pushTail(self, value: int):
+            """
+            从队列尾插入数据
+            :param value:
+            :return:
+            """
+            cur = DoubleListNode(value)
+
+            if not self.head:  # 说明此时双向队列为空，将头和尾指针分别指向新节点
+                self.head = cur
+                self.tail = cur
+            else:
+                self.tail.next = cur
+                cur.last = self.tail
+                self.tail = cur
+
+        def pollHead(self):
+            """
+            从队列头弹出数据
+            :param value:
+            :return:
+            """
+            res = None
+            if not self.head:
+                return res
+
+            res = self.head.val
+            if self.head == self.tail:
+                self.head = None
+                self.tail = None
+            else:
+                self.head = self.head.next
+                self.head.last = None
+
+            self.size -= 1
+            return res
+
+
+        def pollTail(self):
+            """
+            从队列尾弹出数据
+            :param value:
+            :return:
+            """
+            res = None
+            if not self.head:
+                return res
+
+            res = self.head.val
+            if self.head == self.tail:
+                self.head = None
+                self.tail = None
+            else:
+                self.tail = self.tail.last
+                self.tail.next = None
+
+            self.size -= 1
+            return res
+
+
+class ReverseKGroup:
+    """
+    K 个一组翻转链表
+    """
+    def solution(self, head: Optional[ListNode], k: int) -> Optional[ListNode]:
+        def getKGroupEnd(s, k):
+            k -= 1
+            while k != 0 and s:
+                s = s.next
+                k -= 1
+            return s
+
+        def reverse(start, end):
+            end = end.next
+            pre, next = None, None
+            cur = start
+            while cur != end:
+                next = cur.next
+                cur.next = pre
+                pre = cur
+                cur = next
+
+            start.next = end
+
+        start = head
+        end = getKGroupEnd(start, k)
+        # 凑不够一组，直接返回head
+        if not end:
+            return head
+
+        # 第一组凑齐了，最终返回的head指向第一组的尾节点
+        head = end
+        reverse(start, end)
+
+        # 上一组的结尾节点
+        lastEnd = start
+        while lastEnd.next:
+            start = lastEnd.next
+            end = getKGroupEnd(start, k)
+            if not end:
+                return head
+            reverse(start, end)
+            lastEnd.next = end
+            lastEnd = start
+
+        return head
+
+
+class IsPalindromeList:
+    """
+    判断单链表是否为回文串
+    """
+    # def __init__(self, head: ListNode):
+    #     self.head
+
+    def isPalindrome1(self, head: ListNode):
+        """
+        结合栈，需要额外的 O(n) 空间
+        :param head:
+        :return:
+        """
+        stack = []
+        cur = head
+        while cur:
+            stack.append(cur)
+            cur = cur.next
+
+        while head:
+            if head.val != stack.pop().val:
+                return False
+
+            head = head.next
+        return True
+
+    def isPalindrome2(self, head: ListNode):
+        """
+        需要额外 n/2 空间
+        :param head:
+        :return:
+        """
+        if not head or not head.next:
+            return True
+
+        # 奇数个节点，找到中点位置
+        # 偶数个节点，找到下中点位置
+        right = head.next
+        cur = head
+        while cur.next and cur.next.next:
+            right = right.next
+            cur = cur.next.next
+
+        stack = []
+        while right:
+            stack.append(right)
+            right = right.next
+
+        while not stack:
+            if stack.pop().val != head.val:
+                return False
+            head = head.next
+
+        return True
+
+    def isPalindrome2(self, head: ListNode):
+        """
+        只需要O(1)的空间
+        :param head:
+        :return:
+        """
+        if not head or not head.next:
+            return True
+
+        # 找到中点 或 上中点
+        n1, fast = head, head
+        while n1.next and fast.next.next:
+            n1 = n1.next
+            fast = fast.next.next
+
+        n2 = n1.next  # n2 -> right part first node
+        n1.next = None
+
+        while n2:
+            n3 = n2.next
+            n2.next = n1
+            n1 = n2
+            n2 = n3
+
+        n3 = n1  # n3 -> save last node
+        n2 = head  # n2 -> left first node
+
+        res = True
+        while n1 and n2:
+            if n1.val != n2.val:
+                res = False
+                break
+            n1 = n1.next
+            n2 = n2.next
+
+        n1 = n3.next
+        n3.next = None
+        while n1:  # recover list
+            n2 = n1.next
+            n1.next = n3
+            n3 = n1
+            n1 = n2
+
+        return res
+
+
+class SmallerEqualBigger:
+    """
+    将一个链表根据指定数，划分为三部分，小于等于大于
+    """
+    def solution1(self, head: ListNode, pivot: int):
+        """
+        需要 额外数组 空间大小O(N), 然而按照荷兰国旗问题处理
+        :param head:
+        :param pivot:
+        :return:
+        """
+        if not head:
+            return head
+
+        nodeArr = []
+        cur = head
+        while cur:
+            cur = cur.next
+            nodeArr.append(cur)
+
+        self.arrPartition(nodeArr, pivot)
+        for i in range(1, len(nodeArr)):
+            nodeArr[i-1].next = nodeArr[i].next
+        return nodeArr[0]
+
+    def arrPartition(self, nodeArr, pivot):
+        small, big = -1, len(nodeArr)
+        index = 0
+        while index != big:
+            if nodeArr[index].val < pivot:
+                small += 1
+                nodeArr[small], nodeArr[index] = nodeArr[index], nodeArr[small]
+                index += 1
+            elif nodeArr[index].val == pivot:
+                index += 1
+            else:
+                big -= 1
+                nodeArr[big], nodeArr[index] = nodeArr[index], nodeArr[big]
+
+    def solution2(self, head: ListNode, pivot: int):
+        """
+        找到六个节点的引用地址即可，分别是小于区域的头尾结点；等于区域的头尾结点；大于区域的头尾结点。
+        :param head:
+        :param pivot:
+        :return:
+        """
+        if not head:
+            return head
+
+        sH, sT = None, None
+        eH, eT = None, None
+        bH, bT = None, None
+
+        while head:
+            next = head.next
+            head.next = None
+
+            if head.val < pivot:
+                if not sH:
+                    sH = head
+                    sT = head
+                else:
+                    sT.next = head
+                    sT = head
+            elif head.val == pivot:
+                if not eH:
+                    eH = head
+                    eT = head
+                else:
+                    eT.next = head
+                    eT = head
+            else:
+                if not bH:
+                    bH = head
+                    bT = head
+                else:
+                    bT.next = head
+                    bT = head
+
+            head = next
+
+        # 串联三部分
+        # 小于区域的尾巴，连等于区域的头，等于区域的尾巴连大于区域的头
+        if sT:
+            sT.next = eH
+            eT = sT if not eT else eT
+        # 下一步，一定是需要用eT去接大于区域的头
+        # 有等于区域，eT -> 等于区域的尾结点
+        # 无等于区域，eT -> 小于区域的尾结点
+        # eT 尽量不为空的尾巴节点
+        if eT:  # 如果小于区域和等于区域，不是都没有
+            eT.next = bH
+
+        if sH:
+            return sH
+        elif eH:
+            return eH
+        else:
+            return bH
+
+class LinkedListRandom:
+    def __init__(self, x: int, next: 'Node' = None, random: 'Node' = None):
+        self.val = int(x)
+        self.next = next
+        self.random = random
+
+
+class CopyListWithRandom:
+    """
+    https://leetcode-cn.com/problems/copy-list-with-random-pointer/?utm_source=LCUS&utm_medium=ip_redirect&utm_campaign=transfer2china
+    138. 复制带随机指针的链表
+    """
+    def solution(self, head: LinkedListRandom):
+        """
+        结合hashmap，空间复杂度O(N)
+        :return:
+        """
+        old2new = dict()
+        cur = head
+        while cur:
+            old2new[cur] = LinkedListRandom(cur.val, cur.next, None)
+            cur = cur.next
+
+        cur = head
+        while cur:
+            newNode = old2new.get(cur)
+            newNode.next = old2new.get(cur.next)
+            newNode.random = old2new.get(cur.random)
+            cur = cur.next
+        return old2new.get(head)
+
+    def solution1(self, head: LinkedListRandom):
+        """
+        空间复杂度 O(1)，在每个节点后接一个镜像节点
+        :param head:
+        :return:
+        """
+        if not head:
+            return None
+
+        cur = head
+        # 1 -> 2 -> 3 -> null
+        # 1 -> 1' -> 2 -> 2' -> 3 -> 3'
+        while cur:
+            cur.next = LinkedListRandom(cur.val, cur.next, None)
+            cur = cur.next.next
+
+        cur = head
+        # 依次设置 1' 2' 3' random指针
+        while cur:
+            next = cur.next.next
+            copy = cur.next
+            copy.random = cur.random.next if cur.random else None
+            cur = next
+
+        # 1' 位置，要返回结果，先记下来
+        res = head.next
+        cur = head
+        # next方向上，把新老链表分离
+        while cur:
+            next = cur.next.next
+            copy = cur.next
+            cur.next = next
+            copy.next = next.next if next else None
+            cur = next
+
+        return res
+
+
+class FindFirstIntersectNode:
+    """
+    找到两个链表的 交点
+    """
+    def getIntersectNode(self, head1: ListNode, head2: ListNode):
+        """
+
+        :param head1:
+        :param head2:
+        :return:
+        """
+        loop1 = self.getLoopNode(head1)
+        loop2 = self.getLoopNode(head2)
+        # 两个都无环
+        if not loop1 and not loop2:
+            return self.noloop(head1, head2)
+
+        # 两个都有环
+        if loop1 and loop2:
+            return self.bothloop(head1, loop1, head2, loop2)
+
+        # 一个有环，一个无环，这种情况下不会有交点，直接返回None
+        return None
+
+    def getLoopNode(self, head: ListNode):
+        """
+        找到链表第一个入环节点，如果无环，返回null
+        :param head:
+        :return:
+        """
+        if not head or not head.next or not head.next.next:
+            return None
+
+        # n1 slow；n2 fast
+        slow = head.next
+        fast = head.next.next
+        while slow != fast:
+            if not fast.next or not fast.next.next:  # 这种情况不存在环
+                return None
+            fast = fast.next.next
+            slow = slow.next
+
+        # slow fast 相遇
+        fast = head
+        while slow != fast:
+            slow = slow.next
+            fast = fast.next
+        return slow
+
+    def noloop(self, head1, head2):
+        """
+        如果两个链表都无环，返回第一个相交节点，如果不想交，返回null
+        :param head1:
+        :param head2:
+        :return:
+        """
+        if not head1 or not head2:
+            return None
+
+        cur1, cur2 = head1, head2
+        n = 0
+        while cur1.next:
+            n += 1
+            cur1 = cur1.next
+        while cur2.next:
+            n -= 1
+            cur2 = cur2.next
+
+        # 如果有交点，两个链表最后一个节点必相等
+        if cur1 != cur2:
+            return None
+
+        cur1 = head1 if n > 0 else head2  # 谁长，谁的头变成cur1
+        cur2 = head2 if cur1 == head1 else head1
+        n = abs(n)
+        while n != 0:
+            cur1 = cur1.next
+            n -= 1
+        # 此时cur2 开始移动
+        while cur1 != cur2:
+            cur1 = cur1.next
+            cur2 = cur2.next
+        return cur1
+
+    def bothloop(self, head1, loop1, head2, loop2):
+        """
+        两个有环链表，返回第一个相交节点，如果不想交返回null
+        :param head1:
+        :param head2:
+        :return:
+        """
+        if loop1 == loop2:
+            cur1 = head1
+            cur2 = head2
+            n = 0
+            while cur1 != loop1:
+                n += 1
+                cur1 = cur1.next
+            while cur2 != loop2:
+                n -= 1
+                cur2 = cur2.next
+
+            cur1 = head1 if n > 0 else head2  # 谁长，谁的头变成cur1
+            cur2 = head2 if cur1 == head1 else head1
+            n = abs(n)
+            while n != 0:
+                n -= 1
+                cur1 = cur1.next
+
+            while cur1 != cur2:
+                cur1 = cur1.next
+                cur2 = cur2.next
+            return cur1
+        else:
+            cur1 = loop1.next
+            while cur1 != loop1:
+                if cur1 == loop2:
+                    return loop1
+                cur1 = cur1.next
+            return None
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
