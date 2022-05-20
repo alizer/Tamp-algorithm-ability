@@ -905,7 +905,7 @@ class FindFirstIntersectNode:
             cur1 = loop1.next
             while cur1 != loop1:
                 if cur1 == loop2:
-                    return loop1
+                    return loop1  # 这里返回loop1和loop2 均可以
                 cur1 = cur1.next
             return None
 
