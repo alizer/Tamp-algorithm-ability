@@ -115,6 +115,22 @@ if __name__ == '__main__':
     # print(a >> 1)
     # print(random.random())
 
+    # 从左往右依次打印一个数的二进制位为1的值
+    x = 29800
+    n = 32
+    while n > 0:
+        tmp = 1 << n & x
+        if tmp != 0:
+            print(tmp)
+        n -= 1
+
+    print("--------boundary--------")
+    # 从右往左依次打印一个数的二进制位为1的值
+    while x != 0:
+        y = (~x + 1) & x
+        print(y)
+        x -= y
+
     obj = Rand2rand()
     obj.testRes(1000000)
     # n = 0

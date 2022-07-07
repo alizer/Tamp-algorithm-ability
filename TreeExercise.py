@@ -764,3 +764,236 @@ class IsFull:
         height = max(leftInfo.height, rightInfo.height) + 1
         return IsFull.IsFullInfo2(isFull, height)
 
+
+class MorrisTraversal:
+    """
+    二叉树的 Morris 序
+    """
+    def morris(self, head: BinaryTree):
+        if not head:
+            return
+        cur = head
+        while cur:
+            mostRight = cur.left
+            if mostRight:
+                while mostRight.right is not None and mostRight.right != cur:
+                    mostRight = mostRight.right
+                if mostRight.right is None:
+                    mostRight.right = cur
+                    cur = cur.left
+                    continue
+                else:
+                    mostRight.right = None
+            cur = cur.right
+
+    def morrisPre(self, head: BinaryTree):
+        """
+        基于morris的二叉树先序遍历
+        有左子树的节点会来到两次，第一次来到时就打印，就是先序遍历，其他起点来到时 就打印
+        :param head:
+        :return:
+        """
+        if not head:
+            return
+        cur = head
+        while cur:
+            mostRight = cur.left
+            if mostRight:
+                while mostRight.right is not None and mostRight.right != cur:
+                    mostRight = mostRight.right
+                if mostRight.right is None:
+                    print(cur.value)
+                    mostRight.right = cur
+                    cur = cur.left
+                    continue
+                else:
+                    mostRight.right = None
+            else:
+                print(cur.value)
+            cur = cur.right
+
+    def morrisIn(self, head: BinaryTree):
+        """
+        基于morris的二叉树中序遍历
+        有左子树的节点会来到两次，第二次来到时打印，就是中序遍历，其他起点来到时 就打印
+        :param head:
+        :return:
+        """
+        if not head:
+            return
+        cur = head
+        while cur:
+            mostRight = cur.left
+            if mostRight:
+                while mostRight.right is not None and mostRight.right != cur:
+                    mostRight = mostRight.right
+                if mostRight.right is None:
+                    mostRight.right = cur
+                    cur = cur.left
+                    continue
+                else:
+                    mostRight.right = None
+
+            print(cur.value)
+            cur = cur.right
+
+    def morrisPos(self, head: BinaryTree):
+        """
+        基于morris的二叉树后序遍历
+        有左子树的节点会来到两次，在第二次来到时将该节点的左子树的右边界打印，
+        最后再打印逆序打印整棵树的右边界，就是后序遍历。
+        :param head:
+        :return:
+        """
+        if not head:
+            return
+        cur = head
+        while cur:
+            mostRight = cur.left
+            if mostRight:
+                while mostRight.right is not None and mostRight.right != cur:
+                    mostRight = mostRight.right
+                if mostRight.right is None:
+                    mostRight.right = cur
+                    cur = cur.left
+                    continue
+                else:
+                    mostRight.right = None
+                    self.printEdge(cur.left)
+
+            cur = cur.right
+        self.printEdge(head)
+
+    def printEdge(self, head: BinaryTree):
+        tail = self.reverseEdge(head)
+        cur = tail
+        while cur:
+            print(cur.value)
+            cur = cur.right
+        self.reverseEdge(tail)
+
+    def reverseEdge(self, head: BinaryTree):
+        pre, next = None, None
+        while head:
+            next = head.right
+            head.right = pre
+            pre = head
+            head = next
+        return pre
+
+
+class IsBSTMorris:
+    """
+    基于Morris 序， 判断是否为二叉搜索树
+    """
+    def solution(self, head: BinaryTree):
+        """
+        在中序遍历时，去判断
+        :param head:
+        :return:
+        """
+        if not head:
+            return
+        cur = head
+        pre = None
+        while cur:
+            mostRight = cur.left
+            if mostRight:
+                while mostRight.right is not None and mostRight.right != cur:
+                    mostRight = mostRight.right
+                if mostRight.right is None:
+                    mostRight.right = cur
+                    cur = cur.left
+                    continue
+                else:
+                    mostRight.right = None
+
+            if pre is not None and pre >= cur.value:
+                return False
+            pre = cur.value
+            cur = cur.right
+        return True
+
+
+class MinDepth:
+    """
+    https://leetcode.cn/problems/minimum-depth-of-binary-tree/submissions/
+    二叉树的最小深度
+    最小深度是从根节点到最近叶子节点的最短路径上的节点数量。
+    """
+    def solution1(self, head: BinaryTree):
+        """
+        递归
+        :param head:
+        :return:
+        """
+        if not head:
+            return 0
+        return self.process(head)
+
+    def process(self, head: BinaryTree):
+        if not head.left and not head.right:
+            return 1
+
+        leftHeight, rightHeight = float('inf'), float('inf')
+        if head.left:
+            leftHeight = self.process(head.left)
+        if head.right:
+            rightHeight = self.process(head.right)
+
+        return 1 + min(leftHeight, rightHeight)
+
+    def solution2(self, head: BinaryTree):
+        """
+        基于Morris 序，在第二次来到某个节点时，也即 mostRight.right == cur时，那么
+        mostRight 必为叶子节点，这时可以结算其深度。整棵树的最右节点需要单独计算其深度。
+        :param head:
+        :return:
+        """
+        if not head:
+            return 0
+
+        cur = head
+        curLevel = 0
+        minHeight = float('inf')
+        while cur:
+            mostRight = cur.left
+            if mostRight:
+                rightBoardSize = 1
+                while mostRight.right is not None and mostRight.right != cur:
+                    mostRight = mostRight.right
+                    rightBoardSize += 1
+
+                if mostRight.right is None:
+                    curLevel += 1
+                    mostRight.right = cur
+                    cur = cur.left
+                    continue
+                else:
+                    if mostRight.left is None:
+                        minHeight = min(minHeight, curLevel)
+
+                    curLevel -= rightBoardSize
+                    mostRight.right = None
+            else:  # 只有一次到达
+                curLevel += 1
+
+            cur = cur.right
+
+        finalRight = 1
+        cur = head
+        while cur.right:
+            finalRight += 1
+            cur = cur.right
+        if cur.left is None and cur.right is None:
+            minHeight = min(minHeight, finalRight)
+
+        return minHeight
+
+
+
+
+
+
+
+

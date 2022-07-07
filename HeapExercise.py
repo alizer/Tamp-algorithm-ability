@@ -4,7 +4,7 @@
 # Name:         HeapExercise
 # Author:       wendi
 # Date:         2022/5/8
-
+import heapq
 from typing import TypeVar
 
 class MaxHeap:
@@ -91,6 +91,55 @@ class MaxHeap:
 # class HeapGreater:
 #     def __init__(self):
 #         T = TypeVar("T")
+class Matrix_node:
+    def __init__(self, v, r, c):
+        self.value = v
+        self.row = r
+        self.col = c
+
+    def __lt__(self, other):
+        if self.value < other.value:
+            return True
+        else:
+            return False
+
+
+class KthSmallestElementInSortedMatrix:
+    """
+    378. 有序矩阵中第 K 小的元素
+    https://leetcode.cn/problems/kth-smallest-element-in-a-sorted-matrix/
+    """
+    def solution(self, matrix, k):
+        m, n = len(matrix[0]), len(matrix)
+        heap = []
+        set = [[False]*m for _ in range(n)]
+        heapq.heappush(heap, Matrix_node(matrix[0][0], 0, 0))
+        set[0][0] = True
+        cnt = 0
+        ans = None
+        while heap:
+            ans = heapq.heappop(heap)
+            cnt += 1
+            if cnt == k:
+                break
+            row = ans.row
+            col = ans.col
+
+            if row + 1 < n and not set[row+1][col]:
+                heapq.heappush(heap, Matrix_node(matrix[row+1][col], row+1, col))
+                set[row+1][col] = True
+
+            if col + 1 < m and not set[row][col+1]:
+                heapq.heappush(heap, Matrix_node(matrix[row][col + 1], row, col + 1))
+                set[row][col + 1] = True
+
+        return ans.value
+
+
+
+
+
+
 
 
 if __name__ == '__main__':

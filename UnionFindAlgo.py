@@ -62,6 +62,9 @@ class UnionFind:
 
         return self.size_map.__len__()
 
+    def getSetNum(self):
+        return len(self.size_map)
+
 
 class MergeUsers:
     """
@@ -77,5 +80,38 @@ class MergeUsers:
             self.c = c
 
     def mergeUsers(self, users: List[User]):
-        pass
+        unionfind = UnionFind(values=users)
+        map_a = dict()
+        map_b = dict()
+        map_c = dict()
+
+        for user in users:
+            if user.a in map_a.keys():
+                unionfind.union(user, map_a.get(user.a))
+            else:
+                map_a[user.a] = user
+
+            if user.b in map_b.keys():
+                unionfind.union(user, map_b.get(user.b))
+            else:
+                map_b[user.b] = user
+
+            if user.c in map_c.keys():
+                unionfind.union(user, map_c.get(user.c))
+            else:
+                map_c[user.c] = user
+
+        return unionfind.getSetNum()
+
+
+if __name__ == '__main__':
+    obj = MergeUsers()
+    o1 = obj.User(1, 3, 8)
+    o2 = obj.User(2, 3, 6)
+    o3 = obj.User(9, 0, 7)
+    o4 = obj.User(91, 1, 0)
+    res = obj.mergeUsers([o1, o2, o3, o4])
+    print(res)
+
+
 

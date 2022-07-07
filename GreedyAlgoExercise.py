@@ -251,6 +251,84 @@ class IPO:
         return w
 
 
+class MaxPairNumber:
+    """
+    给定一个数组arr，代表每个人的能力值。再给定一个非负数k。
+    如果两个人能力差值正好为k，那么可以凑在一起比赛，一局比赛只有两个人
+    返回最多可以同时有多少场比赛
+    """
+    def solution(self, arr, K):
+        """
+        排序，优先满足较小的数，双指针同时移动
+        :param arr: [1,3,5,7,8,12]
+        :param K: 2
+        :return: [1,3], [5,7] 最多凑齐两场比赛
+        """
+        if not arr or len(arr) < 2:
+            return 0
+        l, r = 0, 0
+        n = len(arr)
+        used = [False]*n
+
+        res = 0
+        while l < n and r < n:
+            if used[l]:
+                l += 1
+            elif l == r:
+                r += 1
+            else:  # 不止一个数，而且都没用过！
+                distance = arr[r]-arr[l]
+                if distance == K:
+                    res += 1
+                    used[r] = True
+                    l += 1
+                    r += 1
+                elif distance < K:
+                    r += 1
+                else:
+                    l += 1
+        return res
+
+
+class BoatsToSavePeople:
+    """
+    给定数组 people 。people[i]表示第 i 个人的体重，船的数量不限，每艘船可以承载的最大重量为 limit。
+    每艘船最多可同时载两人，但条件是这些人的重量之和最多为 limit。
+    返回 承载所有人所需的最小船数 。
+
+    https://leetcode.cn/problems/boats-to-save-people/
+    """
+    def solution(self, arr, limit):
+        """
+        首尾双指针，太巧妙了！！
+        :param arr:
+        :param limit:
+        :return:
+        """
+        arr.sort()
+        # 单人超重，过不去
+        if arr[-1] > limit:
+            return -1
+        l, r = 0, len(arr)-1
+        res = 0
+        while l <= r:
+            two_sum = arr[l] if l == r else arr[l] + arr[r]
+            if two_sum > limit:  # 两个人超重了，只能走一个胖子，瘦子留下来，小贪心
+                r -= 1
+            else:  # 两个人都能过河，同一条船，同样有个小贪心策略在里面，自己揣摩一下
+                l += 1
+                r -= 1
+            res += 1
+        return res
+
+
+
+
+
+
+
+
+
 if __name__ == '__main__':
     obj = IPO()
     res = obj.solution(k = 3, w = 0, profits = [1,2,3], capital = [0,1,2])

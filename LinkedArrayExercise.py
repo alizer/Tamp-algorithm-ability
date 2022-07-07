@@ -8,6 +8,7 @@
 
 # Definition for singly-linked list.
 from typing import List, Optional
+from collections import deque
 
 
 class ListNode:
@@ -85,7 +86,7 @@ class MergeKLists(object):
 
         return dummy.next
 
-    def solution2(self, lists: List[ListNode]) -> Optional[ListNode, None]:
+    def solution2(self, lists: List[ListNode]):
         """
         分而治之，链表两两合并
         :param lists:
@@ -910,23 +911,152 @@ class FindFirstIntersectNode:
             return None
 
 
+class WindowMaxArray:
+    """
+    24 窗口内最大值或最小值的更新结构
+
+    窗口内最大值或最小值更新结构的实现
+    假设一个固定大小为W的窗口，依次划过arr，
+    返回每一次滑出状况的最大值
+    例如，arr = [4,3,5,4,3,3,6,7], W = 3
+    返回：[5,5,5,4,6,7]
+    """
+    def solution(self, nums: List[int], n: int):
+        """
+        双端队列
+        :param nums: [4,3,5,4,3,3,6,7]
+        :param n: 3
+        :return: [5,5,5,4,6,7]
+        """
+        if not nums or n <= 0:
+            return None
+        arr = [0]*(len(nums)-n+1)
+        dq = deque()
+        dq.append(0)
+        i, cnt = 0, 0
+        n = min(len(nums), n)
+        for i in range(1, n):
+            if nums[i] >= nums[dq[-1]]:
+                dq.clear()
+            dq.append(i)
+
+        arr[cnt] = nums[dq[0]]
+        for i in range(n, len(nums)):
+            if dq[0] + n <= i:
+                dq.popleft()
+            if nums[i] <= nums[dq[0]]:
+                if nums[i] <= nums[dq[-1]]:
+                    dq.append(i)
+                else:
+                    while nums[i] > nums[dq[-1]]:
+                        dq.pop()
+                    dq.append(i)
+            else:
+                dq.clear()
+                dq.appendleft(i)
+            cnt += 1
+            arr[cnt] = nums[dq[0]]
+
+        return arr
 
 
+class MonotonousStack:
+    """
+    单调栈
+    给一个无重复值的数组，依次计算数组中每个数的左边和右边比这个数小、且离这个数最近的位置，没有时用None表示
+    返回每个数的左右邻居下标
+    要求时间复杂度为O(N)
+    """
+    def solution(self, arr):
+        """
+        :param arr: [3,5,2,4,7,6]
+        :return:
+        """
+        dc = dict()
+        stack = [0]
+        for i in range(1, len(arr)):
+            while stack and arr[stack[-1]] < arr[i]:
+                idx = stack.pop()
+                if stack:
+                    dc[idx] = [stack[-1], i]
+                else:
+                    dc[idx] = [None, i]
+            stack.append(i)
+
+        while stack:
+            idx = stack.pop()
+            if stack:
+                dc[idx] = [stack[-1], None]
+            else:
+                dc[idx] = [None, None]
+        return dc
+
+    def solution1(self, arr):
+        """
+        有重复值
+        :param arr: [5,4,3,4,5,3,5,6]
+        :return:
+        """
+        dc = dict()
+        stack = [[0]]
+        for i in range(1, len(arr)):
+
+            while stack and arr[stack[-1][0]] >= arr[i]:
+                if arr[stack[-1][0]] == arr[i]:
+                    stack[-1].append(i)
+                    break
+
+                linkedlist = stack.pop()
+                for idx in linkedlist:
+                    if stack:
+                        dc[idx] = [stack[-1][0], i]
+                    else:
+                        dc[idx] = [None, i]
+
+            stack.append([i])
+
+        while stack:
+            linkedlist = stack.pop()
+            for idx in linkedlist:
+                if stack:
+                    dc[idx] = [stack[-1][0], None]
+                else:
+                    dc[idx] = [None, None]
+
+        return dc
+
+    def solution2(self, arr):
+        """
+        给定一个只包含正数的数组arr，arr中任何一个子数组sub，
+        一定都可以算出(sub累加和 )* (sub中的最小值)是什么，
+        那么所有子数组中，这个值最大是多少？
+        :param arr: [5,3,2,1,6,7,8,4]
+        :return:
+        """
+        ans = 0
+        stack = [0]
+        for i in range(1, len(arr)):
+            while stack and arr[stack[-1]] > arr[i]:
+                idx = stack.pop()
+                if stack:
+                    ans = max(ans, arr[idx]*sum(arr[stack[-1]+1:i]))
+                else:
+                    ans = max(ans, arr[idx] * sum(arr[0:i]))
+            stack.append(i)
+
+        while stack:
+            idx = stack.pop()
+            if stack:
+                ans = max(ans, arr[idx] * sum(arr[stack[-1] + 1:len(arr)]))
+            else:
+                ans = max(ans, arr[idx] * sum(arr[0:len(arr)]))
+        return ans
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+if __name__ == '__main__':
+    obj = MonotonousStack()
+    # nums = [4,3,5,2,4,3,6]
+    nums = [5,4,3,4,5,3,5,6]
+    # nums = [5,3,2,1,6,7,8,4]
+    res = obj.solution1(nums)
+    print(res)

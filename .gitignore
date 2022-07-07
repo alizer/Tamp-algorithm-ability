@@ -25,3 +25,5 @@ dist/
 
 # temporary files
 *tmp*.py
+
+main.py

@@ -228,10 +228,77 @@ class MaximalRectangle:
         return max_area
 
 
+class ExpressionCompute:
+    """
+    计算表达式的值：-2+35*((7+8)*(6-3))
+    """
+    def solution(self, s):
+        return self.calc(s, 0)[0]
 
+    def calc(self, s, i):
+        """
+        请从str[i...]往下算，遇到字符串终止位置或者右括号，就停止
+        返回两个值，长度为2的数组
+        0) 负责的这一段的结果是多少
+        1) 负责的这一段计算到了哪个位置
+        :param s: -2+5*((7+8)*(6-3))
+        :param i: index
+        :return:
+        """
+        stack = []
+        cur = 0
+        while i < len(s) and s[i] != ')':
+            if '0' <= s[i] <= '9':
+                cur = cur*10 + int(s[i])
+                i += 1
+            elif s[i] != '(':  # 遇到的是运算符号
+                self.addNum(stack, cur)
+                stack.append(s[i])
+                i += 1
+                cur = 0
+            else:  # 遇到的是(
+                arr = self.calc(s, i+1)
+                cur = arr[0]
+                print(cur)
+                i = arr[1] + 1
+        self.addNum(stack, cur)
+        return [self.getNum(stack), i]
 
+    def addNum(self, stack, num):
+        """
+        看一下，当前栈顶元素是什么运算符号，如果是 '+' or '-', 把num 直接放进去;
+        如果是 '*' or '/', 则进行运算合并，将运算后的数字放到栈顶。
+        :param stack:
+        :param num:
+        :return:
+        """
+        if stack:
+            top = stack.pop()
+            if top == '+' or top == '-':
+                stack.append(top)
+            else:
+                cur = stack.pop()
+                num = cur * num if top == '*' else cur / num
+        stack.append(num)
 
+    def getNum(self, stack):
+        """
+        对当前栈的元素进行运算
+        :param stack:
+        :return:
+        """
+        res = 0
+        add = True
+        while stack:
+            cur = stack.pop(0)
+            if cur == '+':
+                add = True
+            elif cur == '-':
+                add = False
+            else:
+                res += cur if add else (-cur)
 
+        return res
 
 
 
@@ -248,9 +315,11 @@ if __name__ == '__main__':
     # stack.pop()
     # stack.pop()
     # print('最小元素：', stack.getMin())
-    # print(stack.minStack)
+    # print(stack.minStack)'-2+35*((7+8)*(6-3))'
 
-    obj = DailyTemperatures()
-    res = obj.solution(temperatures = [73,74,75,71,69,72,76,73])
+    obj = ExpressionCompute()
+    exp = '-2+35*((7+8)*(6-3))'
+    res = obj.solution(exp)
+    print(eval(exp))
     print(res)
 

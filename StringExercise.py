@@ -267,13 +267,11 @@ class LongestPalindrome(object):
         :return:
         """
         t = self.preProcess(s)
-        print(t)
         n = len(t)
         p = [0]*n
         C, R = 0, 0
         for i in range(1, n-1):
             i_mirror = 2 * C - i
-            print(f'C, R: {C}, {R}')
             if R > i:
                 p[i] = min(R-i, p[i_mirror])
             else:
@@ -370,7 +368,80 @@ class PrintMatrix:
         return res
 
 
+class KMP:
+    """
+    kmp 算法
+    """
+    def solution(self, str1, str2):
+        """
+
+        :param str1: ABABCABABA
+        :param str2: ABABA
+        :return: 若匹配，返回匹配的起始位置；否则，返回False
+        """
+        next_arr = self.build_next(str2)
+        i, j = 0, 0
+        while i < len(str1):
+            if str1[i] == str2[j]:
+                i += 1
+                j += 1
+            elif j > 0:
+                j = next_arr[j-1]
+            else:
+                i += 1
+            if j == len(str2):
+                return i - j
+
+        return False
+
+    def build_next(self, pattern):
+        """
+        计算next 数组
+        :param pattern: ABABCABABA
+        :return:
+        """
+        next = [0]
+        # 当前公共前后缀的长度
+        prefix_len = 0
+        i = 1
+        while i < len(pattern):
+            if pattern[prefix_len] == pattern[i]:
+                prefix_len += 1
+                next.append(prefix_len)
+                i += 1
+            else:
+                if prefix_len == 0:
+                    next.append(0)
+                    i += 1
+                else:
+                    prefix_len = next[prefix_len - 1]
+
+        return next
+
+
+class isRotateSubStr:
+    """
+    判断是否为选择子串问题
+    """
+    def solution(self, str1, str2):
+        """
+        判断str2 是否为 str1 的旋转子串
+        思路：将str1 扩展一遍得到新字符串str3，
+        然后判断str2是否为str3的子串
+        :param str1:
+        :param str2:
+        :return:
+        """
+        obj = KMP()
+        res = obj.solution(str1*2, str2)
+        if res:
+            return True
+        else:
+            return False
+
+
 if __name__ == '__main__':
-    obj = PrintMatrix()
-    res = obj.solution2([[1,2,3],[5,6,7,],[9,10,11]])
+    obj = isRotateSubStr()
+    # res = obj.build_next('ABABCABABA')
+    res = obj.solution('AABCD', 'BCDBA')
     print(res)

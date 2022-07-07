@@ -859,6 +859,127 @@ class SplitNum:
         return arr
 
 
+class TrappingRainWater:
+    """
+    接雨水，一维
+    https://leetcode.cn/problems/trapping-rain-water/
+    """
+    def solution(self, height: List[int]) -> int:
+        if not height or len(height) < 3:
+            return 0
+
+        n = len(height)
+        l, r = 1, n-2
+        left_max, right_max = height[0], height[n-1]
+        res = 0
+
+        while l <= r:
+            if left_max >= right_max:
+                res += max(0, right_max-height[r])
+                right_max = max(right_max, height[r])
+                r -= 1
+            else:
+                res += max(0, left_max-height[l])
+                left_max = max(left_max, height[l])
+                l += 1
+        return res
+
+
+class TrappingRainWater2:
+    """
+    接雨水，二维
+    """
+    class Node:
+        def __init__(self, value, row, col):
+            self.value = value
+            self.row = row
+            self.col = col
+
+        def __lt__(self, other):
+            """
+            自定义比较器
+            :param other:
+            :return:
+            """
+            if self.value <= other.value:
+                return True
+            else:
+                return False
+
+    def solution(self, height: List[List[int]]) -> int:
+        if not height:
+            return 0
+        n = len(height)
+        m = len(height[0])
+        isEnter = [[False] * m for _ in range(n)]
+
+        # 定义小根堆
+        hp = []
+        for col in range(m-1):
+            val = height[0][col]
+            new_node = TrappingRainWater2.Node(val, 0, col)
+            heapq.heappush(hp, new_node)
+            isEnter[0][col] = True
+
+        for row in range(n-1):
+            val = height[row][m-1]
+            new_node = TrappingRainWater2.Node(val, row, m-1)
+            heapq.heappush(hp, new_node)
+            isEnter[row][m-1] = True
+
+        for col in range(m-1, 0, -1):
+            val = height[n-1][col]
+            new_node = TrappingRainWater2.Node(val, n-1, col)
+            heapq.heappush(hp, new_node)
+            isEnter[n-1][col] = True
+
+        for row in range(n-1, 0, -1):
+            val = height[row][0]
+            new_node = TrappingRainWater2.Node(val, row, 0)
+            heapq.heappush(hp, new_node)
+            isEnter[row][0] = True
+
+        cur_max = 0
+        res = 0
+        while hp:
+            cur_node = heapq.heappop(hp)
+            cur_max = max(cur_max, cur_node.value)
+            r, c = cur_node.row, cur_node.col
+            # 下方格子  雨水结算
+            if r > 0 and not isEnter[r-1][c]:
+                res += max(0, cur_max-height[r-1][c])
+                isEnter[r-1][c] = True
+                val = height[r-1][c]
+                new_node = TrappingRainWater2.Node(val, r-1, c)
+                heapq.heappush(hp, new_node)
+
+            # 上方格子 雨水结算
+            if r < n-1 and not isEnter[r + 1][c]:
+                res += max(0, cur_max - height[r + 1][c])
+                isEnter[r + 1][c] = True
+                val = height[r + 1][c]
+                new_node = TrappingRainWater2.Node(val, r + 1, c)
+                heapq.heappush(hp, new_node)
+
+            # 左方格子 雨水结算
+            if c > 0 and not isEnter[r][c-1]:
+                res += max(0, cur_max - height[r][c-1])
+                isEnter[r][c-1] = True
+                val = height[r][c-1]
+                new_node = TrappingRainWater2.Node(val, r, c-1)
+                heapq.heappush(hp, new_node)
+
+            # 右方格子 雨水结算
+            if c < m - 1 and not isEnter[r][c+1]:
+                res += max(0, cur_max - height[r][c+1])
+                isEnter[r][c+1]= True
+                val = height[r][c+1]
+                new_node = TrappingRainWater2.Node(val, r, c + 1)
+                heapq.heappush(hp, new_node)
+
+        return res
+
+
 if __name__ == '__main__':
     # KthLargest(k=3, nums=[])
     # obj = KthLargest(5, [4, 5, 8, 2, 3, 6, 7])
